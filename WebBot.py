@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
 import json
-import time
 from typing import List, Dict, Tuple
-from pprint import pprint
+
 import praw
 import requests
 
@@ -25,6 +24,9 @@ class WebBot(object):
     In reality, only goes on two sites:
         - dci.org, for parsing and checking for show updates
         - reddit.com, for posting said updates
+
+    Primary functionality is parsing JSON information and formatting that to
+    a markdown-based reddit post.
     """
 
     def __init__(self, subreddit: str='dcicsstest'):
@@ -42,22 +44,41 @@ class WebBot(object):
             username=username,
             password=password)
 
-    def _parse_show_info(self, show_info: Dict) -> List[Tuple[str, str]]:
-        """Takes show's JSON response and returns the title and recap link."""
-        comp_guid = show_info['competitionGuid']
-        api_keys = {'competition': comp_guid, 'callback': 'jQuery'}
+    def _parse_show_recap(self, show_rounds: List[Dict]) -> str:
+        """Reads through show query and formats to a reddit post."""
+        body_str = ''
+
+        for _round in show_rounds:
+            body_str += '## ' + _round['name'] + '\n\n'
+            body_str += '[Full Recap Here](' + _round['fullRecapUrl'] + ')\n\n'
+
+            body_str += 'Rank|Corp|Score\n'
+            body_str += ':--|:--|:--\n'
+
+            for perf in _round['performances']:
+                body_str += '{}|{}|{:.2f}\n'.format(perf['rank'], perf['name'],
+                                                    perf['score'])
+
+            body_str += '\n\n---\n\n'
+
+        return body_str
+
+    def _parse_show_info(self, show_guid: str) -> Tuple[str, str]:
+        """Pings show's GUID and returns the title and recap post.
+
+        show_guid: an API GUID that corresponds to a certain show
+        returns: a two-item tuple with the formatted title and reddit body
+        """
+        api_keys = {'competition': show_guid, 'callback': 'jQuery'}
         resp = requests.get(COMP_URL, params=api_keys)
 
         # Strip off jquery tags from the response string
         content = resp.content.decode('utf-8')
         show = json.loads(content[7:-2])
 
-        recaps = [rnd['categoryRecapUrl'] for rnd in show['rounds']]
-        if len(recaps) > 1:
-            return [(show['name'] + ' - ' + sh['name'], sh['categoryRecapUrl'])
-                    for sh in show['rounds']]
-        else:
-            return [(show['name'], recaps)]
+        title_str = '[Score Recap] ' + show['name'] + ' | ' + show['location']
+        body = self._parse_show_recap(show['rounds'])
+        return (title_str, body)
 
     def post_thread(self, show_info: Dict):
         """Submits a link-post to the specified subreddit.
@@ -69,14 +90,8 @@ class WebBot(object):
         """
         subr = self.conn.subreddit(self.subreddit)
 
-        for title, link in self._parse_show_info(show_info):
-            pprint(link)
-            pprint(title)
-            submission = subr.submit(title, url=link)
-            time.sleep(15)
-
-            submission.reply(BOT_INFO)
-            time.sleep(45)
+        title, body = self._parse_show_info(show_info['competitionGuid'])
+        subr.submit(title, selftext=body)
 
     def get_show_list(self) -> List[Dict]:
         """Scrapes the DCI.org API site and returns a list of shows"""

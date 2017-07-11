@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import time
 from typing import Dict
 
 import pandas as pd
-from pprint import pprint
+
 from WebBot import WebBot
 from config import show_file
 
@@ -28,10 +29,10 @@ class ShowManager(object):
 
     def check_if_new_shows(self):
         """Compares online show list with self show list.
-        
+
         If the show_file in config doesn't exist, it overwrites and creates
         the file. This WILL delete anything in that file, be careful!
-        
+
         If a new show exists, it posts to reddit [/r/dci] with the
         appropriate info.
         """
@@ -48,8 +49,8 @@ class ShowManager(object):
 
         for show in web_shows:
             if show['competitionGuid'] not in self.shows.GUID.values:
-                pprint(show)
-                self.bot.post_thread(show)
                 self._add_show(show)
+                self.bot.post_thread(show)
+                # time.sleep(9 * 60)  # Reddit API timeout
 
         self.shows.to_csv(show_file, index=False, header=False)
