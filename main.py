@@ -2,7 +2,7 @@
 
 import sys
 
-from ShowManager import ShowManager
+from src.show_manager import ShowManager
 
 
 def run(post: bool):
@@ -11,11 +11,10 @@ def run(post: bool):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 2:
-        print('Valid run methods are: "./main.py" and "./main.py post"')
-        sys.exit(1)
-
-    if sys.argv[1] == 'post':
+    if len(sys.argv) == 1:
+        run(False)
+    elif sys.argv[1] == 'post':
         run(True)
     else:
-        run(False)
+        print('Valid run methods are: "./main.py" and "./main.py post"')
+        sys.exit(1)
