@@ -5,7 +5,7 @@ from typing import Dict
 
 import pandas as pd
 
-from WebBot import WebBot
+from src.WebBot import WebBot
 from config import show_file, subreddit
 
 
