@@ -10,7 +10,7 @@ from config import username, password, client_id, client_secret, show_file
 
 BOT_INFO = (
     "*I'm a bot! Check me out on " +
-    "[GitHub](https://github.com/bradysalz/DCI-Scores-Bot)!" +
+    "[GitHub](https://github.com/bradysalz/DCI-Scores-Bot-v2)!" +
     " Please PM me with any additional feedback.* \n\n" + "*Hope you enjoy!*")
 
 ORG_URL = 'http://bridge.competitionsuite.com/api/orgscores/GetCompetitionsByOrganization/jsonp'  # noqa
@@ -61,6 +61,7 @@ class WebBot(object):
 
             body_str += '\n\n---\n\n'
 
+        body_str += '\n\n' + BOT_INFO
         return body_str
 
     def _parse_show_info(self, show_guid: str) -> Tuple[str, str]:
@@ -82,9 +83,6 @@ class WebBot(object):
 
     def post_thread(self, show_info: Dict):
         """Submits a link-post to the specified subreddit.
-
-        Also waits 15s, then comments with info about the bot. If people want
-        I can change this to a self-post later.
 
         show_info: a Dict of all the JSON response info on the show
         """

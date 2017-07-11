@@ -5,3 +5,4 @@ client_id = 'YOUR_REDDIT_APP_ID'
 client_secret = 'YOUR_TOP_SECRET_REDDIT_APP_CODE'
 
 show_file = 'shows.csv'
+subreddit = 'drumcorps'
