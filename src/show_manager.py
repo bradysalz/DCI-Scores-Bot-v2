@@ -51,7 +51,7 @@ class ShowManager(object):
                 self._add_show(show)
 
                 if post:
+                    self.shows.to_csv(show_file, index=False, header=False)
                     self.bot.post_thread(show)
+                    print('Added {}'.format(show['name']))
                     time.sleep(9 * 60)  # Reddit API timeout
-
-        self.shows.to_csv(show_file, index=False, header=False)
