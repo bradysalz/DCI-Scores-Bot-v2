@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-source 'YOUR_VENV_DIR_HERE'
-cd 'YOUR_INSTALL_DIR'
-./main.py post
+source /home/brady/.virtualenvs/dci-bot/bin/activate
+cd /home/brady/dev/DCI-Bot
+./main.py 
